@@ -176,6 +176,8 @@ class srcFile:
                     new = temp.replace(",", "[,", 1)
                     new = new + "]);\n"
                     x = re.sub(temp, new, y)
+                elif (re.search(r";", y)):
+                    x = y
                 self.fun.format = x
                 self.fun.format = re.sub(r"[*]{2}", "", self.fun.format)
                 self.fun.format = re.sub(r"\s+Format: ", "", self.fun.format)
@@ -203,12 +205,13 @@ class srcFile:
                 y = x
                 temp = ""
                 x = f.readline()
+                temp = x
                 x = re.sub("\*\*\s+", "", x)
-                while not (re.search(r"Output", temp)):
-                    while not (re.search(r"\*\*\n", x) or re.search(r"Output", x) or re.search(r"\*{2}\s+\S+\s\s+", x)):
+                while not (re.search(r"\*\*\n", x) or re.search(r"Output", x) or re.search(r"\*{2}\s+\S+\s\s+", x)):
                         x = re.sub("\*\*\s+", "", x)
                         y = y + x
                         x = f.readline()
+                while (re.search(r"\*", temp)):
                     y = re.sub("\*\*\s+", "", y)
                     y = re.sub(r"Input[s]*:", "", y)
                     input = re.split(r"\s\s\s*", y)
@@ -237,20 +240,22 @@ class srcFile:
                         s = "Data."
                     self.fun.paramList.append(param(n, t, s))
                     count = count + 1
+                    if (re.search(r"Output", temp)):
+                        break
                     #x = f.readline()
                     while (re.search(r"\*{2}\n", x)):
                         x = f.readline()
                     temp = f.readline()
-                    while not (re.search(r"\*{2}\n", temp) or re.search(r"Output", temp)):
-                        temp = re.sub(r"\*{2}\s+", " ", temp)
+                    while not (re.search(r"\*{2}\s+\S+\s\s+\S+", temp) or re.search(r"Output", temp)):
+                        temp = re.sub(r"\*{2}\s+", "", temp)
                         x = x + temp
                         temp = f.readline()
                     x = x.replace("\n", "")
                     y = x
-                for i in range(count, len(self.fun.paramNameList)):
-                    if (re.search(r"\]", self.fun.paramNameList[i])):
-                        s = "Optional argument"
-                    n = self.fun.paramNameList[i]
+                for i in range(count, len(pL)):
+                    #if (re.search(r"\]", pL[i])):
+                    s = "Optional argument"
+                    n = pL[i]
                     n = n.replace(" ", "")
                     n = n.replace(",", "")
                     n = n.replace("[", "")
@@ -266,9 +271,12 @@ class srcFile:
                     continue
                 if (re.search("Output:*\n", y)):
                     y = f.readline()
-                y = temp
+                temp = f.readline()
+                if (re.search(r"\*{2}\n", y)):
+                    y = temp
+                    temp = ""
                 while (re.search(r"[\*]", y) and re.search(r"[^Remarks]", y) and re.search(r"[^**\n]", y)):
-                    while not (re.search(r"Example", temp)):
+                    while not (re.search(r"Example", temp) or re.search(r"\*\/\n", temp)):
                         y = y + " " + temp
                         temp = f.readline()
                         if (re.search(r"[*]{2}\s+\S+\s\s+", temp)):
@@ -311,6 +319,7 @@ class srcFile:
                         s = re.sub("\n", "", s)
                     self.fun.returnList.append(returnVal(n, t, s))
                     y = f.readline()
+                    x = temp
                 #print(self.fun.returnList)
             if re.search(r".+Remarks:", x):
                 y = x
