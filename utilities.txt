@@ -1,0 +1,235 @@
+/*
+** utilties.src
+** (C) Copyright 2017-2018 by Aptech Systems, Inc.
+** All Rights Reserved.
+**
+** This Software Product is PROPRIETARY SOURCE CODE OF APTECH
+** SYSTEMS, INC.    This File Header must accompany all files using
+** any portion, in whole or in part, of this Source Code.   In
+** addition, the right to create such files is strictly limited by
+** Section 2.A. of the GAUSS Applications License Agreement
+** accompanying this Software Product.
+**
+** If you wish to distribute any portion of the proprietary Source
+** Code, in whole or in part, you must first obtain written
+** permission from Aptech Systems.
+**
+*/
+#include impute.sdf
+
+/*
+**> contains
+**
+**  Purpose: Indicates whether one matrix, multidimensional array or string
+**           array contains any elements from another symbol.
+**
+**  Format:
+**        found  = contains(haystack,needles);
+**
+**  Input:
+**        haystack    Matrix, multi-dimensional array or string array. The
+**                    symbol to search.
+**
+**        needles     Matrix, multi-dimensional array or string array,
+**                    containing the elements to look for.
+**
+**  Output:
+**        found       Scalar, 1 if one or more elements from 'needles' was
+**                    found in 'haystack', or 0 if no matches were found.
+**
+**                    If 'needles' contains only one element, the output
+**                    from 'contains' will be the same as the '==' operator
+**                    for numeric data, or the '$==' operator for string data.
+**
+**
+** Examples
+**
+**  Example 1: Find whether a matrix contains either 1 or -1
+**
+**  haystack = { 4 9  2,
+**              -1 0  3,
+**               2 2 -1 };
+**
+**  needles = { -1, 1 };
+**
+**  //Search 'haystack' for any match of -1 or 1
+**  found = contains(haystack, needles);
+**
+**  After the above code, 'found' will equal 1, since 'haystack' contains at least one
+**  element equal to one of the elements, -1 in this case, of 'needles'.
+**
+**  Example 2: Find whether a string array contains one of multiple specified missing values
+**
+**  //Create a string array containing a set of
+**  //possible missing value indicators
+**  missing = "" $| "NaN" $| ".";
+**
+**  variables = "height" $| "weight" $| "" $| "age";
+**
+**  //Search 'variables' for any of the elements
+**  //contained in 'missing'
+**  found = contains(categories, missing);
+**
+**  After the above code, 'found' will equal 1, since 'variables' contains at least one
+**  element equal to one of the elements, a null string ("") in this case, of 'missing'.
+**
+**  indexcat, indnv, ismiss, reclassify
+*/
+
+Gauss code
+
+/*
+**> impute
+**
+**  Purpose: Fills missing values in columns of a matrix with a choice of imputation methods.
+**
+**  Format:
+**        x_full  = impute(x);
+**        x_full  = impute(x [, method, depvars, iCtl]);
+**
+**  Input:
+**
+**       x          NxK matrix, multidimensional array.
+**
+**       method     Optional string input, the imputation method to use. Valid options include:
+**
+**                      "mean" (default).
+**                      "median"
+**                      "mode"
+**                      "predict"
+**                      "pmm"
+**                      "lrd"
+**
+**
+**  Output:
+**
+**      x_full     NxK matrix or multidimensional array with all missing values filled.
+**
+*/
+
+Gauss code
+
+/*
+**> head
+**
+**  Purpose: Returns the first n rows of a matrix, dataframe or string array.
+**
+**  Format:
+**        h = head(X);
+**        h = head(X,n);
+**
+**  Input:
+**        X           Matrix, dataframe or string array, the data to preview.
+**
+**        n           Optional input, the number of rows to return. Default = 5.
+**                    If a negative number is supplied, all except the first n rows
+**                    will be returned.
+**
+**  Output:
+**        h          The first n rows of X (or all but the first n rows of X, if n is negative).
+**
+**
+** Examples
+**
+**       X = { 11 14,
+**             27 19,
+**             44 12,
+**             81 17,
+**             23 22,
+**             14 43 };
+**
+**       head(X);
+**
+**   The above code will print:
+**
+**       11.000000        14.000000 
+**       27.000000        19.000000 
+**       44.000000        12.000000 
+**       81.000000        17.000000 
+**       23.000000        22.000000
+**
+**
+**     head(X, 3);
+**
+**   will print out:
+**
+**       11.000000        14.000000 
+**       27.000000        19.000000 
+**       44.000000        12.000000
+**
+**
+**     head(X, -2);
+**
+**   will print out:
+**
+**       44.000000        12.000000 
+**       81.000000        17.000000 
+**       23.000000        22.000000
+**       14.000000        43.000000
+**     
+**             
+*/
+
+Gauss code
+
+/*
+**> tail
+**
+**  Purpose: Returns the last n rows of a matrix, dataframe or string array.
+**
+**  Format:
+**        h = tail(X);
+**        h = tail(X,n);
+**
+**  Input:
+**        X           Matrix, dataframe or string array, the data to preview.
+**
+**        n           Optional input, the number of rows to return. Default = 5.
+**                    If a negative number is supplied, all except the last n rows
+**                    will be returned.
+**
+**  Output:
+**        h          The last n rows of X (or all but the last n rows of X, if n is negative).
+**
+**
+** Examples
+**
+**       X = { 11 14,
+**             27 19,
+**             44 12,
+**             81 17,
+**             23 22,
+**             14 43 };
+**
+**       tail(X);
+**
+**   The above code will print:
+**
+**       27.000000        19.000000
+**       44.000000        12.000000 
+**       81.000000        17.000000 
+**       23.000000        22.000000
+**       14.000000        43.000000
+**
+**
+**     tail(X, 3);
+**
+**   will print out:
+**
+**       81.000000        17.000000 
+**       23.000000        22.000000
+**       14.000000        43.000000
+**
+**
+**     tail(X, -2);
+**
+**   will print out:
+**
+**       11.000000        14.000000 
+**       27.000000        19.000000 
+**       44.000000        12.000000 
+**       81.000000        17.000000 
+**     
+**             
+*/
+

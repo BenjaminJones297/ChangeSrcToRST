@@ -1,0 +1,86 @@
+/*
+** between.src
+** (C) Copyright 2022 by Aptech Systems, Inc.
+** All Rights Reserved.
+**
+** This Software Product is PROPRIETARY SOURCE CODE OF APTECH
+** SYSTEMS, INC.    This File Header must accompany all files using
+** any portion, in whole or in part, of this Source Code.   In
+** addition, the right to create such files is strictly limited by
+** Section 2.A. of the GAUSS Applications License Agreement
+** accompanying this Software Product.
+**
+** If you wish to distribute any portion of the proprietary Source
+** Code, in whole or in part, you must first obtain written
+** permission from Aptech Systems.
+*/
+
+/*
+**> between
+**
+**  Purpose:    Returns a binary matrix with a 1 if the corresponding
+**              element of X is between 'a' and 'b', with an option to specify
+**              whether the ends are inclusive.
+**
+**  Format:     mask =  between(X, a, b [, inclusive]);
+**
+**  Input:      X      NxK matrix or dataframe.
+**              left   1x1 matrix or dataframe, the lower limit of the range.
+**              right  1x1 matrix or dataframe, the upper limit of the range.
+**
+**  Output:     mask NxK matrix with a 1 if the corresponding element
+**              of X is in the specified range, otherwise a 0.
+**
+**  Example:
+**              X = { 2  6,
+**                    4  3,
+**                    1  5 };
+**
+**              left = 2;
+**              right = 5;
+**              mask = between(x, left, right);
+**
+**              After the above code:
+**
+**              mask = 1 0
+**                     1 1
+**                     0 1
+**
+**
+**  Example 2:
+**              X = { 2  6,
+**                    4  3,
+**                    1  5 };
+**
+**              left = 2;
+**              right = 5;
+**              inclusive = "right";
+**              mask = between(X, left, right, inclusive);
+**
+**              After the above code:
+**
+**              mask = 0 0
+**                     1 1
+**                     0 1
+**
+**  Example 3 Dates:
+**              // Create a sequence of dates from March 4th, 2005
+**              // to March 9th, 2005
+**              X = seqaposix("2005-03-04", 1, "days", 6);
+**
+**              left = "2005-03-06";
+**              right = "2005-03-08";
+**              mask = between(X, left, right);
+**
+**              After the above code:
+**
+**              mask = 0
+**                     0
+**                     1
+**                     1
+**                     1
+**                     1
+**
+**
+** See also: selif, delif
+*/

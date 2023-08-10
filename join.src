@@ -1,0 +1,90 @@
+/*
+** join.src
+**
+**
+** (C) Copyright 2017  Aptech Systems, Inc.
+** All Rights Reserved.
+**
+** This Software Product is PROPRIETARY SOURCE CODE OF APTECH
+** SYSTEMS, INC.    This File Header must accompany all files using
+** any portion, in whole or in part, of this Source Code.   In
+** addition, the right to create such files is strictly limited by
+** Section 2.A. of the GAUSS Applications License Agreement
+** accompanying this Software Product.
+**
+** If you wish to distribute any portion of the proprietary Source
+** Code, in whole or in part, you must first obtain written
+** permission from Aptech Systems.
+*/
+
+/*
+** Purpose: Joins to matrices based upon user-specified key columns,
+** with non-matching rows removed.
+**
+** Format: C = innerJoin(A, ca, B, cb);
+**
+**  Inputs:
+**
+**  A    Matrix to join.
+**  ca   Scalar, or vector, key columns in 'A'.
+**  B    Matrix to join with 'A'.
+**  cb   Scalar or vector, key columns in 'B'.
+**
+**  Outputs:
+**
+**  C    Matrix, result of join of 'A' and 'B'.
+**
+**  Remarks:
+**
+**  The first columns of the output matrix C will be the
+**  columns of A in the same order as in A. The remaining
+**  columns of C will be the columns of B with the
+**  key columns removed.
+**
+**  Example:
+**
+**  A = { 1 12 0.5,
+**        3 15 0.6,
+**        5 19 1.1,
+**        2 11 0.9 };
+**
+**  B = { 7 0.3 5,
+**        2 1.1 1,
+**        9 0.1 3 };
+**
+**  C = innerJoin(A, 1, B, 3);
+**
+**  After the code above, C equals:
+**
+**  C = { 1 12 0.5 2 1.1,
+**        3 15 0.6 9 0.1,
+**        5 19 1.1 7 0.3 };
+**
+*/
+
+Gauss code
+
+/*
+** mergeCatLabels -- return a dataframe where the values for all category or string labels from
+**                   the specified column of the modify dataframe are set to match
+**                   the value of any corresponding labels in the reference dataframe.
+**
+**                   Note that this may require the labels from the modify dataframe
+**                   that are not also in the reference data to have their index value changed.
+**
+**  Inputs:
+**
+**                    df_ref -- The reference dataframe.
+**                    idx_ref -- The column to reference in the reference dataframe.
+**                    df_mod -- The dataframe to modify.
+**                    idx_mod -- The column to modify in the modify dataframe.
+**
+** Output:
+**
+**                    out -- A copy of the 'df_mod' dataframe where string labels and values in the
+**                           specified column do not conflict.
+**
+** Example:
+**
+**
+*/
