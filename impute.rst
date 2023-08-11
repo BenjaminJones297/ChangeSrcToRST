@@ -22,8 +22,8 @@ Format
     :param iCtl: Optional argument
     :type iCtl: 
 
-    :return x_full: NxK matrix or multidimensional array with all missing values filled 
-    :rtype x_full: matrix or multidimensional matrix
+    :return x_full: NxK matrix or multidimensional array with all missing values filled
+    :rtype x_full: matrix or multidimensional array
 
 Examples
 ----------------
