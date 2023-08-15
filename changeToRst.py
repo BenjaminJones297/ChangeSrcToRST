@@ -16,6 +16,7 @@ class function:
         self.returnNameList = []
         self.remarks = ""
         self.purpose = ""
+        self.globals = []
 
 class returnVal:
     def __init__(self):
@@ -58,7 +59,7 @@ class example:
 class srcFile:
     def __init__(self):
         #self.fileName = sys.argv[1]
-        self.fileName = "utilities.txt"
+        self.fileName = "ols.src"
         self.outFile = ""
         self.fun = function()
         self.funList = []
@@ -111,6 +112,8 @@ class srcFile:
         f = open(self.fileName, "r")
         numFun = 0
         for x in f:
+            if re.search(r"Purpose", x):
+                return 1
             if (re.search(r"^\n", x)):
                 count = 0
                 for x in f:
@@ -131,13 +134,7 @@ class srcFile:
     def find_vars(self, num):
         anExample = False
         y = ""
-        self.fun.paramList = []
-        self.fun.paramNameList = []
-        self.fun.returnList = []
-        self.fun.returnNameList = []
-        self.fun.name = ""
-        self.fun.remarks = ""
-        self.fun.exList = []
+        self.fun = function()
         f = open(self.fileName, "r")
         self.exList = []
         pL = []
@@ -146,7 +143,7 @@ class srcFile:
         curFun = -1
         for x in f:
             while (curFun != num):
-                if re.search(r"\/\*\n", x):
+                if re.search(r"\/\*\n", x) or re.search(r"\*{2}>\s+\S+\n", x):
                     curFun = curFun + 1
                 if (curFun == num):
                     break
@@ -172,7 +169,9 @@ class srcFile:
                 if (re.search(r"Format:*\n", x)):
                     x = f.readline()
                 y = f.readline()
-                if (re.search(r";", y) and not re.search(r"\[", y)):
+                if (re.search(r"=\n$", x)):
+                    x = x + y
+                elif (re.search(r";", y) and not re.search(r"\[", y)):
                     y = y.replace(");\n", "")
                     #temp = re.sub(x, r"", tempY)
                     temp = y.replace(x.replace(");\n", ""), "")
@@ -185,11 +184,14 @@ class srcFile:
                 self.fun.format = re.sub(r"[*]{2}", "", self.fun.format)
                 self.fun.format = re.sub(r"\s+Format: ", "", self.fun.format)
                 self.fun.format = self.fun.format.replace(";", "")
-                self.fun.format = re.sub(r"\s\s+", "", self.fun.format, 1)
+                self.fun.format = re.sub(r"\s\s+", "", self.fun.format)
+                self.fun.format = self.fun.format.replace("\n", "")
                 y = re.split(r"[=]", x)
                 z = re.split(r"[(]", y[-1])
                 title = z[0]
                 title = title.replace(" ", "")
+                title = title.replace("*", "")
+                title = title.replace("\n", "")
                 self.fun.name = title
                 #print(title)
                 #print(self.fun.paramList)
@@ -213,13 +215,15 @@ class srcFile:
                 x = f.readline()
                 temp = x
                 x = re.sub("\*\*\s+", "", x)
-                while not (re.search(r"\*\*\n", x) or re.search(r"Output", x) or re.search(r"\S+\s\s+", x)):
+                while not (re.search(r"\*{2}\s\s+\S+\s\s+", x) or re.search(r"Output", x)):
                         x = re.sub("\*\*\s+", "", x)
                         y = y + x
                         x = f.readline()
+                z1 = re.search(r"\*{2}\s+", x).group()
+                z2 = len(z1)
                 while (re.search(r"\*", temp)):
                     y = re.sub("\*\*\s+", "", y)
-                    y = re.sub(r"Input[s]*:", "", y)
+                    y = re.sub(r"Input[s]*:\s*", "", y)
                     input = re.split(r"\s\s\s*", y)
                     n = input[0]
                     s = input[-1].replace(".\n", "")
@@ -244,7 +248,10 @@ class srcFile:
                     t = t.lower()
                     if (len(s) == 0):
                         s = "Data."
-                    self.fun.paramList.append(param(n, t, s))
+                    if (re.search(r"global", s)):
+                        self.fun.globals.append(param(n, t, s))
+                    else:
+                        self.fun.paramList.append(param(n, t, s))
                     count = count + 1
                     if (re.search(r"Output", temp) or re.search(r"Output", x) or re.search(r"Output", y)):
                         break
@@ -253,7 +260,9 @@ class srcFile:
                         x = f.readline()
                     if not (re.search(r"\*{2}\s+\S+\s\s+\S+", x) or re.search(r"Output", x) or re.search(r"Example", x)):
                         temp = f.readline()
-                    while not (re.search(r"\*{2}\s+\S+\s\s+\S+", temp) or re.search(r"Output", temp) or re.search(r"Example", temp)):
+                    while not (re.search(r"Output", temp) or re.search(r"Example", temp)):
+                        if (not ((len(re.search(r"\*{2}\s+", temp).group())) > z2)) and not re.search(r"\*{2}\n", temp):
+                            break
                         temp = re.sub(r"\*{2}\s+", "", temp)
                         x = x + temp
                         temp = f.readline()
@@ -289,17 +298,23 @@ class srcFile:
                 if (re.search(r"\*{2}\n", y)):
                     y = temp
                     temp = ""
+                x2 = re.sub(r"Output", "      ", x)
+                x2 = re.sub(r"s:", "  ", x2)
+                x2 = re.sub(r":", " ", x2)
+                z1 = re.search(r"\*{2}\s+", x2).group()
+                z2 = len(z1)
                 if (re.search(r"Outputs*:*\n", y)):
                     y = f.readline()
-                while (re.search(r"[\*]", y) and re.search(r"[^**\n]", y) and re.search(r"[^Remarks]", y)):
-                    while not (re.search(r"Example", temp) or re.search(r"\*\/\n", temp) or re.search(r"[^Remarks]", y)):
-                        y = y + " " + temp
+                #FIXME make output collect text until an equally indented variable appears
+                while (re.search(r"[\*]", x) and re.search(r"[^**\n]", x) and not re.search(r"Remarks", x)):
+                    while not (re.search(r"Example", temp) or re.search(r"\*\/\n", temp) or re.search(r"Remarks", y)):
+                        y = y + temp
                         temp = f.readline()
-                        if (re.search(r"[*]{2}\s+\S+\s\s+", temp)):
+                        if (not ((len(re.search(r"\*{2}\s+", temp).group())) > z2)) and not re.search(r"\*{2}\n", temp):
                             break
                     y = re.sub(r"Output.*:", "", y)
-                    if (re.search(r"[*]{2}\n ", y)):
-                        y = re.sub(r"[*]{2}\n ", "",  y)
+                    if (re.search(r"[*]{2}\n", y)):
+                        y = re.sub(r"[*]{2}\n", "",  y)
                     input = re.split(r"\s+", y, 2)
                     n = input[1]
                     s = input[-1].replace(".\n", "")
@@ -310,8 +325,8 @@ class srcFile:
                         t = z.group()
                     else:
                         t = re.split(r"\s", s)[0]
-                    if (re.search(r"\w+x\w+", s)):
-                        t = re.search(t + r"\s\S+", s).group()
+                    if (re.search(r"\s\w+x\w+\s", s)):
+                        t = t + re.search(r"\s\w+x\w+\s\S+", s).group()
                         #s = re.sub(t, "", s)
                     elif (re.search(" matrix", s)):
                         #s = s.replace(t + " matrix", "")
@@ -333,8 +348,11 @@ class srcFile:
                     if (re.search(r"\n$", s)):
                         s = re.sub("\n", "", s)
                     self.fun.returnList.append(returnVal(n, t, s))
-                    y = f.readline()
+                    if not (not ((len(re.search(r"\*{2}\s+", temp).group())) > z2)) and not re.search(r"\*{2}\n", temp):
+                         y = f.readline()
+                         temp = y 
                     x = temp
+                    y = ""
                 #print(self.fun.returnList)
             if re.search(r".+Remarks:", x):
                 y = x
@@ -365,7 +383,7 @@ class srcFile:
                 anExample = True
                 if (re.search(self.fun.name, x)):
                     y = x
-                if not (re.search(r"\s*Example\s+\d+:", y) or re.search(self.fun.name, x)):
+                if (re.search(r"Example\S*:*\n", x)):
                     y = f.readline()
                 comments = ""
                 while (re.search(r"[*]{2}\n", y)):
@@ -396,12 +414,14 @@ class srcFile:
                 y = y.replace("**  ", "")
                 varName = re.search("\S+", y)
                 output = ""
-                y = f.readline()
-                y = f.readline()
-                x = f.readline()
+                while(re.search(r"\*{2}\n", y)):
+                    y = f.readline()
+                #y = f.readline()
+                x = ""
                 while not (re.search(r"\*{2}\n", x)):
                     y = y + x
                     x = f.readline()
+                #FIXME: thinks its over after new line when thats not always the case
                 count = 0
                 for i in self.fun.returnList:
                     y = y.replace("'", "*")
@@ -439,6 +459,26 @@ class srcFile:
                     ex.setCom(comments)
                     self.exList.append(ex)
                     x = y
+            if (re.search(r"Global", x)):
+                y = ""
+                while not (re.search(r"\*{2}\n", y)):
+                    x = x + y
+                    y = f.readline()
+                x = re.sub(r"\*\*\s+Globals*:*", r"", x)
+                x = re.sub(r"\*{2}\s+", r"", x)
+                x = x.replace("\n", "")
+                globalList = re.split(r",\s*", x)
+                if not (len(globalList) == len(self.fun.globals)):
+                    globalNameList = []
+                    for i in self.fun.globals:
+                        globalNameList.append(i.name)
+                    for i in globalList:
+                        if not (any(item in i for item in globalNameList)):
+                            self.fun.globals.append(param(i, "Global Param", ""))
+                #print(str(self.fun.globals))
+        return self.fun
+                
+
 
 
 f = srcFile()
