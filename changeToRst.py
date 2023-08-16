@@ -16,7 +16,6 @@ class function:
         self.returnNameList = []
         self.remarks = ""
         self.purpose = ""
-        self.globals = []
 
 class returnVal:
     def __init__(self):
@@ -248,10 +247,7 @@ class srcFile:
                     t = t.lower()
                     if (len(s) == 0):
                         s = "Data."
-                    if (re.search(r"global", s)):
-                        self.fun.globals.append(param(n, t, s))
-                    else:
-                        self.fun.paramList.append(param(n, t, s))
+                    self.fun.paramList.append(param(n, t, s))
                     count = count + 1
                     if (re.search(r"Output", temp) or re.search(r"Output", x) or re.search(r"Output", y)):
                         break
@@ -380,60 +376,78 @@ class srcFile:
                 return self.fun
             
             if ((re.search(r"Example", x) or re.search(r"Example", y)) or ((len(self.exList) > 0) and (re.search(self.fun.name, x)))):
-                anExample = True
-                if (re.search(self.fun.name, x)):
-                    y = x
-                if (re.search(r"Example\S*:*\n", x)):
-                    y = f.readline()
-                comments = ""
-                while (re.search(r"[*]{2}\n", y)):
-                    if (re.search(r"\\{2}", y)):
-                        comments = comments + y
-                    y = f.readline()
-                comments = re.sub(r"\s*Example\s.{1}:\n", "", comments)
-                ex = example()
-                input = ""
-                if (re.search(r"Example", y)):
-                    y = re.sub(r".+Example\s*\d*:*\s*", "", y)
-                    input = input + y
-                    y = f.readline()
+                while (True):
+                    if (re.search(r"\**\n", x)):
+                        while (re.search(r"\*{2}\n", x) or re.search(r"^\n$", x)):
+                            x = f.readline()
+                    if (re.search(r"\*\/\n", x)):
+                        return self.fun
+                        break
+                    if (re.search(r"See Also", x)):
+                        self.fun.remarks = self.fun.remarks + x
+                        break
+                    if (re.search(r"Global", x)):
+                        break
+                    anExample = True
+                    if (re.search(self.fun.name, x)):
+                        y = x
+                    if (re.search(r"Example\S*:*\n", x)):
+                        y = f.readline()
+                    comments = ""
+                    while (re.search(r"[*]{2}\n", y)):
+                        if (re.search(r"\\{2}", y)):
+                            comments = comments + y
+                        y = f.readline()
+                    comments = re.sub(r"\s*Example\s.{1}:\n", "", comments)
+                    ex = example()
+                    input = ""
+                    if (re.search(r"Example", y)):
+                        y = re.sub(r"Examples:", "          ", y)
+                        y = re.sub(r".+Example\s*\d*:*\s*", "", y)
+                        z1 = re.search(r"[*]*\s\s+", y)
+                        input = input + y
+                        y = f.readline()
+                        while(re.search(r"\*{2}\n", y)):
+                            y = f.readline()
+                    else:
+                        z1 = re.search(r"[*]*\s\s+", y)
+                    while not re.search(" " + self.fun.name + r"\W", y):
+                        #if (re.search(r"[*]{2}\s\s+", y)):
+                            #y = re.sub(re.escape(z1.group()), "    ", y)
+                        input = input + y
+                        y = f.readline()
+                    #if (re.search(r"[*]{2}\s\s+", y)):
+                            #y = re.sub(re.escape(z1.group()), "    ", y)
+                    #input = input + y
+                    input = input.replace("**", "")
+                    #input = re.sub(re.escape(z1.group()), "", input)
+                    ex.setIn(input)
+                    y = y.replace("**", "")
+                    varName = re.search("\S+", y)
+                    output = ""
                     while(re.search(r"\*{2}\n", y)):
                         y = f.readline()
-                z1 = re.search(r"[*]{2}\s\s+", y)
-                while not re.search(self.fun.name, y):
-                    if (re.search(r"[*]{2}\s\s+", y)):
-                        y = re.sub(re.escape(z1.group()), "    ", y)
-                    input = input + y
-                    y = f.readline()
-                if (re.search(r"[*]{2}\s\s+", y)):
-                        y = re.sub(re.escape(z1.group()), "    ", y)
-                input = input + y
-                input = input.replace("**  ", "    ")
-                input = input.replace("**", "")
-                ex.setIn(input)
-                y = y.replace("**  ", "")
-                varName = re.search("\S+", y)
-                output = ""
-                while(re.search(r"\*{2}\n", y)):
-                    y = f.readline()
-                #y = f.readline()
-                x = ""
-                while not (re.search(r"\*{2}\n", x)):
-                    y = y + x
-                    x = f.readline()
-                #FIXME: thinks its over after new line when thats not always the case
-                count = 0
-                for i in self.fun.returnList:
+                    #y = f.readline()
+                    x = ""
+                    while not (re.search(r"\*{2}\n", x)):
+                        y = y + x
+                        x = f.readline()
+                    x = ""
+                    #FIXME: thinks its over after new line when thats not always the case
+                    count = 0
+                    #for i in self.fun.returnList:
                     y = y.replace("'", "*")
                     if (re.search(r",\s{1}\S+\s", y)):
                         z1 = re.search(r",\s{1}\S+\s", y)
                         z2 = ", *" + varName.group() + "* "
                         y = re.sub(z1.group(), z2, y)
                     y = y + "\n::\n"
-                    #if (re.search(r"[*]{2}\s\s+", y)):
-                        #y = re.sub(re.escape(z1.group()), "", y)
+                    if (re.search(r"[*]{2}\s\s+", y)):
+                        y = re.sub(re.escape(z1.group()), "", y)
                     count = 0
-                    while not (re.search(";", y) or re.search(r"Example", y)):
+                    output = y
+                    y = f.readline()
+                    while not (re.search(";", y) or re.search(r"\s\s+Example", y) or re.search(r"\=", y) or re.search(r"Globals", y)):
                         if not (re.search(r"\*", y)):
                             break
                         y = y.replace("**", "")
@@ -452,6 +466,7 @@ class srcFile:
                     y = y.replace("**", "")
                     y = y.replace(" };", "")
                     #output = output + y
+                    output = output.replace("**", "")
                     output = output.replace(",", "")
                     output = output.replace("*/\n", "")
                     output = re.sub(r"\n\n\n+", "\n", output)
@@ -460,22 +475,10 @@ class srcFile:
                     self.exList.append(ex)
                     x = y
             if (re.search(r"Global", x)):
-                y = ""
-                while not (re.search(r"\*{2}\n", y)):
-                    x = x + y
-                    y = f.readline()
-                x = re.sub(r"\*\*\s+Globals*:*", r"", x)
-                x = re.sub(r"\*{2}\s+", r"", x)
-                x = x.replace("\n", "")
-                globalList = re.split(r",\s*", x)
-                if not (len(globalList) == len(self.fun.globals)):
-                    globalNameList = []
-                    for i in self.fun.globals:
-                        globalNameList.append(i.name)
-                    for i in globalList:
-                        if not (any(item in i for item in globalNameList)):
-                            self.fun.globals.append(param(i, "Global Param", ""))
-                #print(str(self.fun.globals))
+                while not (re.search(r"\*{2}\n", x)):
+                    x = f.readline()
+            if (re.search(r"See Also", x)):
+                self.fun.remarks = self.fun.remarks + x
         return self.fun
                 
 
