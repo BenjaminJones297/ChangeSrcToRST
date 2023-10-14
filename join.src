@@ -65,26 +65,5 @@
 Gauss code
 
 /*
-** mergeCatLabels -- return a dataframe where the values for all category or string labels from
-**                   the specified column of the modify dataframe are set to match
-**                   the value of any corresponding labels in the reference dataframe.
-**
-**                   Note that this may require the labels from the modify dataframe
-**                   that are not also in the reference data to have their index value changed.
-**
-**  Inputs:
-**
-**                    df_ref -- The reference dataframe.
-**                    idx_ref -- The column to reference in the reference dataframe.
-**                    df_mod -- The dataframe to modify.
-**                    idx_mod -- The column to modify in the modify dataframe.
-**
-** Output:
-**
-**                    out -- A copy of the 'df_mod' dataframe where string labels and values in the
-**                           specified column do not conflict.
-**
-** Example:
-**
 **
 */
