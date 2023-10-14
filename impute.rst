@@ -8,8 +8,7 @@ Fills missing values in columns of a matrix with a choice of imputation methods.
 
 Format
 ----------------
-.. function:: x_full  = impute(x [, method, depvars, iCtl])
-
+.. function:: x_full= impute(x [, method, depvars, iCtl])
     :param x: NxK matrix, multidimensional array
     :type x: matrix 
 
@@ -23,7 +22,7 @@ Format
     :type iCtl: 
 
     :return x_full: NxK matrix or multidimensional array with all missing values filled
-    :rtype x_full: matrix or multidimensional array
+    :rtype x_full: matrix or multidimensional matrix
 
 Examples
 ----------------
