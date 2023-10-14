@@ -139,5 +139,4 @@ If a column of constant value has been included among
 the independent variables, this variable will be
 deleted.
 
-**  See Also:   olsqr
-**  See Also:   olsqr
+See Also:   olsqr
