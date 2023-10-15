@@ -56,9 +56,10 @@ class example:
         return self.comments + self.input + "\n" + self.output
     
 class srcFile:
-    def __init__(self):
+    def __init__(self, fileName):
+        self.fileName = fileName
         #self.fileName = sys.argv[1]
-        self.fileName = "C:\\Users\\benja\\Documents\\aptechWork\\rstProject\\ChangeSrcToRST\\join.src"
+        #self.fileName = "C:\\Users\\benja\\Documents\\aptechWork\\rstProject\\ChangeSrcToRST\\between.src"
         self.outFile = ""
         self.fun = function()
         self.funList = []
@@ -80,7 +81,7 @@ class srcFile:
         return out
     # writes file
     def write(self):
-        f = open(self.outFile, "w")
+        f = open("C:\\Users\\benja\\Documents\\aptechWork\\rstProject\\ChangeSrcToRST\\output\\"+self.outFile, "w")
         f.write(self.fun.name)
         f.write("\n")
         for i in range(0, len(self.fun.name) * 4):
@@ -90,7 +91,7 @@ class srcFile:
         f.write("\n\nFormat\n----------------\n")
         f.write(".. function:: ")
         f.write(self.fun.format)
-        f.write("\n")
+        f.write("\n\n")
         f.write(self.writeVar())
         f.write("Examples\n----------------")
         f.write(self.writeExample())
@@ -233,7 +234,9 @@ class srcFile:
                     y = re.sub(r"Input[s]*:\s*", "", y) # format the first line
                     input = re.split(r"\s\s\s*", y) # break into varname, description
                     n = input[0] # n = name
-                    s = input[-1].replace(".\n", "") # s = description w/o \n
+                    s = input[-1].replace("\n", "") # s = description w/o \n
+                    if not (re.search(r"\S+\s+\S+\s+\S+\s+\S+", s)): # if it is not a full sentence, (3 words or less, then no comma)
+                        s = s.replace(".", "")
                     if (re.search(r"\w+,\s", s)): # if there is a comma t is that word, hoping its the type
                         if (re.search(r"\S+\sor\s\S+", x)):
                             z = re.search(r"\S+\sor\s\S+", s) # if comma and an or
@@ -245,7 +248,7 @@ class srcFile:
                             z = re.findall(r"[^,]+,", s) # find every part with a comma
                             t = "".join(z) # and throw them together
                         else:
-                            z = re.search(r"\S+\sor\s\S+", s) # if no comma and an or
+                            z = re.search(r".*or\s\S+", s) # if no comma and an or
                             t = z.group() # make those two words the type
                         s = re.split(t, s)[-1]
                         s = s.replace(" ", "", 1)
@@ -295,6 +298,7 @@ class srcFile:
                 x = temp # x is latest line
 
             if re.search(r"Output\w*:", x):
+                # FIXME indentation not correct and the sentence with code above should not be in result
                 y = x # y is curline
                 while (re.search(r"[*]{2}\n", y)): # skip ahead until its not just **\n
                     y = f.readline()
@@ -312,11 +316,12 @@ class srcFile:
                 y = ""
                 while (re.search(r"\*\*\n", temp)): # if its just newlines skip until its not
                     temp = f.readline()
-                x = temp
+                if not (re.search(r"utput:*\s+\w+", x)):
+                    x = temp
                 x2 = re.sub(r"Output", "      ", x)
                 x2 = re.sub(r"s:", "  ", x2)
                 x2 = re.sub(r":", " ", x2) # if it was included on input line take that off
-                z1 = re.search(r"\*{2}\s+", x2).group()
+                z1 = re.search(r"\**\s+", x2).group()
                 z2 = len(z1)
                 if (re.search(r"Outputs*:*\n", y)):
                     y = f.readline()
@@ -338,7 +343,7 @@ class srcFile:
                     if (re.search(r"\s*[^,]+,", s)):
                         t = re.search(r"\s*[^,]+,", s).group()
                     elif (re.search(r"\S+\sor\s\S+", s)):
-                        z = re.search(r"\S+\sor\s\S+", s)
+                        z = re.search(r".*or\s\S+", s)
                         t = z.group()
                     else:
                         t = re.split(r"\s", s)[0]
@@ -409,7 +414,7 @@ class srcFile:
                     if (re.search(r"\*\/\n", x) or re.search(r"^\**\s*\n$", x)):
                         return self.fun
                         break
-                    if (re.search(r"See Also", x)):
+                    if (re.search(r"See also", x)):
                         #self.fun.remarks = self.fun.remarks + x
                         break
                     if (re.search(r"Global", x)):
@@ -427,6 +432,9 @@ class srcFile:
                     comments = re.sub(r"\s*Example\s.{1}:\n", "", comments)
                     ex = example()
                     input = ""
+                    if (x == ""):
+                        x = f.readline()
+                        y = x
                     if (re.search(r"Example", x)):
                         temp = x
                     if (re.search(r"Example", x)):
@@ -519,9 +527,9 @@ class srcFile:
             if (re.search(r"Global", x)):
                 while not (re.search(r"\*{2}\n", x)):
                     x = f.readline()
-            if (re.search(r"See Also", x)):
+            if (re.search(r"See also", x)):
                 self.fun.remarks = self.fun.remarks + re.sub(r"\*\*\s+", "", x)
         return self.fun
-
-f = srcFile()
-f.makeRSTFiles()
+for n in range(1, len(sys.argv)):
+    f = srcFile("C:\\Users\\benja\\Documents\\aptechWork\\rstProject\\ChangeSrcToRST\\"+sys.argv[n])
+    f.makeRSTFiles()
