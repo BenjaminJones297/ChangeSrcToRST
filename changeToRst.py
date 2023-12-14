@@ -429,6 +429,7 @@ class srcFile:
                         if (re.search(r"\\{2}", y)):
                             comments = comments + y
                         y = f.readline()
+                    y = y.replace("**","  ")
                     comments = re.sub(r"\s*Example\s.{1}:\n", "", comments)
                     ex = example()
                     input = ""
@@ -448,15 +449,17 @@ class srcFile:
                             y = f.readline()
                     else:
                         z1 = re.search(r"[*]*\s\s+", y)
+                    # if it sees the functions name we are done
                     while not re.search(" " + self.fun.name + r"\W", y):
-                        #if (re.search(r"[*]{2}\s\s+", y)):
-                            #y = re.sub(re.escape(z1.group()), "    ", y)
+                        if (re.search(r"[*]{2}\s\s+", y)):
+                            y = re.sub(re.escape(z1.group()), "    ", y)
                         input = input + y
                         y = f.readline()
+                    input = input + y
                     #if (re.search(r"[*]{2}\s\s+", y)):
                             #y = re.sub(re.escape(z1.group()), "    ", y)
                     #input = input + y
-                    input = input.replace("**", "")
+                    input = input.replace("**", "  ")
                     input = input.replace("'", "*")
                     #input = re.sub(re.escape(z1.group()), "", input)
                     ex.setIn(input)
@@ -465,9 +468,10 @@ class srcFile:
                     output = ""
                     while(re.search(r"\*{2}\n", y)):
                         y = f.readline()
-                    #y = f.readline()
+                    y = f.readline()
                     x = ""
                     while not (re.search(r"\*{2}\n", x)):
+                        y = y.replace("**\n","")
                         y = y + x
                         x = f.readline()
                     x = ""
@@ -475,16 +479,18 @@ class srcFile:
                     count = 0
                     #for i in self.fun.returnList:
                     y = y.replace("'", "*")
-                    #if (re.search(r",\s{1}\W+\s", y)):
-                        #z1 = re.search(r",\s{1}\W+\s", y)
-                    #z2 = ", *" + varName.group() + "* "
-                    #y = re.sub(re.escape(varName.group()), z2, y)
+                    y = y.replace("**","")
+                    if (re.search(r",\s{1}\W+\s", y)):
+                        z1 = re.search(r",\s{1}\W+\s", y)
+                    z2 = "*" + varName.group() + "*"
+                    y = re.sub(re.escape(varName.group()), z2, y)
                     y = y + "\n::\n"
                     if (re.search(r"[*]{2}\s\s+", y)):
                         y = re.sub(re.escape(z1.group()), "", y)
                     count = 0
                     output = y
                     y = f.readline()
+                    #y = f.readline()
                     while not (re.search(";", y) or re.search(r"\s\s+Example", y) or re.search(r"Globals", y)):
                         if not (re.search(r"\*", y)):
                             break
@@ -502,8 +508,8 @@ class srcFile:
                             count = 1
                         y = f.readline()
                     y = y.replace("**", "")
-                    y = y.replace(" };", "")
-                    #output = output + y
+                    #y = y.replace(" };", "")
+                    output = output + y
                     output = output.replace("**", "")
                     output = output.replace("'", "*")
                     output = output.replace(",", "")
@@ -531,5 +537,6 @@ class srcFile:
                 self.fun.remarks = self.fun.remarks + re.sub(r"\*\*\s+", "", x)
         return self.fun
 for n in range(1, len(sys.argv)):
-    f = srcFile("C:\\Users\\benja\\Documents\\aptechWork\\rstProject\\ChangeSrcToRST\\"+sys.argv[n])
+    print(sys.argv[n])
+    f = srcFile("C:\\Users\\benja\\Documents\\aptechWork\\RSTProject\\ChangeSrcToRST\\"+sys.argv[n])
     f.makeRSTFiles()
